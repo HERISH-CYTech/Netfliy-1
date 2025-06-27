@@ -1,0 +1,14 @@
+biometricshield/
+├── public/
+│   ├── index.html
+│   └── ...
+├── src/
+│   ├── App.tsx
+│   ├── index.tsx
+│   └── index.css
+├── .gitignore
+├── package.json
+├── tailwind.config.js
+├── postcss.config.js
+├── tsconfig.json
+└── README.md
