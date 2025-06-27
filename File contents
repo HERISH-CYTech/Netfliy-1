@@ -1,0 +1,438 @@
+//package.json
+
+{
+  "name": "biometricshield",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.3.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  }
+}
+
+//tailwind.config.js
+
+
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+//postcss.config.js
+
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+//tsconfig.json
+
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["src"]
+}
+
+//public/index.html
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BiometricShield</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+  </head>
+  <body class="bg-black text-white">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
+
+//src/index.tsx
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+//src/index.css
+
+css
+
+Copy
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+//src/App.tsx
+
+Use the full React component code I provided earlier, with the color helper functions and all JSX intact. Here it is again for convenience:
+
+tsx
+
+import React, { useState } from 'react';
+
+const App: React.FC = () => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [securityStatus, setSecurityStatus] = useState({
+    ipVerification: { status: 'Secure', color: 'green' },
+    vpnDetection: { status: 'No VPN Detected', color: 'green' },
+    connectionSecurity: { status: 'Encrypted', color: 'green' },
+    biometricVerification: { status: 'Awaiting Upload', color: 'yellow' }
+  });
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+    }
+  };
+
+  const simulateUpload = () => {
+    if (!file) return;
+    setIsUploading(true);
+    setUploadProgress(0);
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsUploading(false);
+          setSecurityStatus(prev => ({
+            ...prev,
+            biometricVerification: { status: 'Processing', color: 'blue' }
+          }));
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 500);
+  };
+
+  const runSecurityScan = () => {
+    const statuses = ['Scanning', 'Analyzing', 'Verifying', 'Complete'];
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      if (currentIndex >= statuses.length - 1) {
+        clearInterval(interval);
+        setSecurityStatus(prev => ({
+          ...prev,
+          biometricVerification: { status: 'Verified', color: 'green' }
+        }));
+        return;
+      }
+      setSecurityStatus(prev => ({
+        ...prev,
+        biometricVerification: {
+          status: statuses[currentIndex],
+          color: 'yellow'
+        }
+      }));
+      currentIndex++;
+    }, 1000);
+  };
+
+  const textColorClass = (color: string) => {
+    switch (color) {
+      case 'green': return 'text-green-400';
+      case 'yellow': return 'text-yellow-400';
+      case 'blue': return 'text-blue-400';
+      default: return 'text-gray-400';
+    }
+  };
+
+  const bgColorClass = (color: string) => {
+    switch (color) {
+      case 'green': return 'bg-green-500';
+      case 'yellow': return 'bg-yellow-500';
+      case 'blue': return 'bg-blue-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <header className="bg-black text-white py-4 px-6 flex justify-between items-center border-b border-gray-800">
+        <div className="flex items-center space-x-2">
+          <h1 className="text-2xl font-bold">BiometricShield</h1>
+          <span className="bg-green-500 h-2 w-2 rounded-full"></span>
+          <span className="text-xs text-green-400">System Active</span>
+        </div>
+        <nav className="hidden md:flex items-center space-x-8">
+          <a href="https://readdy.ai/home/7287bdde-30df-470b-8f01-80884992a09c/ae9cb087-fb81-4667-a442-a4aae87769e5" data-readdy="true" className="hover:text-gray-300 cursor-pointer">Dashboard</a>
+          <a href="#" className="hover:text-gray-300 border-b-2 border-white cursor-pointer">Upload</a>
+          <a href="#" className="hover:text-gray-300 cursor-pointer">Verification</a>
+          <a href="#" className="hover:text-gray-300 cursor-pointer">Reports</a>
+        </nav>
+        <div className="flex items-center space-x-4">
+          <button className="text-white cursor-pointer">
+            <i className="fas fa-bell"></i>
+          </button>
+          <button className="text-white cursor-pointer">
+            <i className="fas fa-cog"></i>
+          </button>
+          <div className="flex items-center space-x-2 cursor-pointer">
+            <div className="h-8 w-8 bg-gray-600 rounded-full flex items-center justify-center">
+              <i className="fas fa-user"></i>
+            </div>
+            <span className="hidden md:inline">Admin</span>
+          </div>
+        </div>
+      </header>
+      {/* Main Content */}
+      <main className="container mx-auto py-8 px-4">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Left Column - Upload Section */}
+          <div className="bg-black text-white p-6 rounded-lg shadow-lg border border-gray-800">
+            <h2 className="text-xl font-semibold mb-4">Media Upload</h2>
+            <div
+              className={`border-2 border-dashed ${isDragging ? 'border-gray-400' : 'border-gray-600'} rounded-lg p-8 text-center cursor-pointer transition-all duration-200`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <i className="fas fa-cloud-upload-alt text-4xl mb-4"></i>
+              <h3 className="text-lg mb-2">
+                {file ? file.name : 'Drag and drop your files here'}
+              </h3>
+              <p className="text-gray-400 mb-4">
+                {file ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` : 'or'}
+              </p>
+              {!file && (
+                <label className="bg-black text-white px-6 py-2 rounded-button whitespace-nowrap cursor-pointer inline-block hover:bg-gray-900 transition-colors border border-gray-800">
+                  Browse Files
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </label>
+              )}
+              {file && !isUploading && (
+                <div className="space-y-4">
+                  <button
+                    className="bg-black text-white px-6 py-2 rounded-button whitespace-nowrap cursor-pointer hover:bg-gray-900 transition-colors border border-gray-800 mr-4"
+                    onClick={simulateUpload}
+                  >
+                    Start Upload
+                  </button>
+                  <button
+                    className="bg-black text-white px-6 py-2 rounded-button whitespace-nowrap cursor-pointer hover:bg-gray-900 transition-colors border border-gray-800"
+                    onClick={() => setFile(null)}
+                  >
+                    Clear Selection
+                  </button>
+                </div>
+              )}
+              {isUploading && (
+                <div className="w-full">
+                  <div className="bg-gray-800 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-green-500 h-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-gray-400 mt-2">Uploading: {uploadProgress}%</p>
+                </div>
+              )}
+            </div>
+            <div className="mt-4 text-gray-400 text-sm">
+              <p>Supported formats: JPG, PNG, MP4, MOV</p>
+              <p>For best results, use high-resolution media files</p>
+            </div>
+          </div>
+          {/* Right Column - Security Status */}
+          <div className="bg-black text-white p-6 rounded-lg shadow-lg border border-gray-800">
+            <h2 className="text-xl font-semibold mb-6">Security Status</h2>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                <div className="flex items-center space-x-3">
+                  <i className="fas fa-shield-alt text-xl"></i>
+                  <div>
+                    <h3 className="font-medium">IP Verification</h3>
+                    <p className="text-gray-400 text-sm">Your connection is being monitored</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-400">Secure</span>
+                  <span className="bg-green-500 h-3 w-3 rounded-full"></span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                <div className="flex items-center space-x-3">
+                  <i className="fas fa-network-wired text-xl"></i>
+                  <div>
+                    <h3 className="font-medium">VPN Detection</h3>
+                    <p className="text-gray-400 text-sm">Checking for virtual private networks</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-400">No VPN Detected</span>
+                  <span className="bg-green-500 h-3 w-3 rounded-full"></span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                <div className="flex items-center space-x-3">
+                  <i className="fas fa-lock text-xl"></i>
+                  <div>
+                    <h3 className="font-medium">Connection Security</h3>
+                    <p className="text-gray-400 text-sm">Data transmission protection</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-400">Encrypted</span>
+                  <span className="bg-green-500 h-3 w-3 rounded-full"></span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <i className="fas fa-fingerprint text-xl"></i>
+                  <div>
+                    <h3 className="font-medium">Biometric Verification</h3>
+                    <p className="text-gray-400 text-sm">Advanced identity protection</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className={textColorClass(securityStatus.biometricVerification.color)}>
+                    {securityStatus.biometricVerification.status}
+                  </span>
+                  <span className={`${bgColorClass(securityStatus.biometricVerification.color)} h-3 w-3 rounded-full`}></span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-8">
+              <button
+                className={`bg-black text-white px-6 py-3 rounded-button whitespace-nowrap w-full font-medium cursor-pointer hover:bg-gray-900 transition-colors border border-gray-800 ${!file ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={runSecurityScan}
+                disabled={!file}
+              >
+                Run Security Scan
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+      {/* Footer */}
+      <footer className="bg-black text-white mt-12 py-10 px-6 border-t border-gray-800">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">BiometricShield</h3>
+              <p className="text-gray-400 mb-4">Advanced biometric security solutions for enterprise and government applications.</p>
+              <div className="flex space-x-4">
+                <a href="#" className="text-gray-400 hover:text-white cursor-pointer">
+                  <i className="fab fa-twitter"></i>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white cursor-pointer">
+                  <i className="fab fa-linkedin"></i>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white cursor-pointer">
+                  <i className="fab fa-facebook"></i>
+                </a>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="https://readdy.ai/home/7287bdde-30df-470b-8f01-80884992a09c/ae9cb087-fb81-4667-a442-a4aae87769e5" data-readdy="true" className="hover:text-white cursor-pointer">Dashboard</a></li>
+                <li><a href="#" className="hover:text-white cursor-pointer">Upload Center</a></li>
+                <li><a href="#" className="hover:text-white cursor-pointer">Verification Portal</a></li>
+                <li><a href="#" className="hover:text-white cursor-pointer">Analytics & Reports</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Legal</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white cursor-pointer">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white cursor-pointer">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-white cursor-pointer">Contact Support</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact</h3>
+              <p className="text-gray-400">1234 Security Blvd.<br />Cyber City, CC 56789</p>
+              <p className="text-gray-400 mt-2">Email: support@biometricshield.com</p>
+              <p className="text-gray-400">Phone: (123) 456-7890</p>
+            </div>
+          </div>
+          <div className="mt-8 text-center text-gray-500 text-sm">
+            &copy; {new Date().getFullYear()} BiometricShield. All rights reserved.
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
